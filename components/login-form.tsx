@@ -33,10 +33,10 @@ export default function LoginForm() {
     }
 
     return (
-        <Card className="w-[350px]">
+        <Card className="w-[350px] shadow-lg shadow-slate-900">
             <CardHeader>
-                <CardTitle className="font-bold text-4xl">Login</CardTitle>
-                <CardDescription>You are entering the chatbot application, please enter your credentials.</CardDescription>
+                <CardTitle className="font-bold text-3xl">Login</CardTitle>
+                <CardDescription>You are entering chatbot application, please enter your credentials.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
