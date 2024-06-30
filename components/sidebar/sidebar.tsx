@@ -33,7 +33,7 @@ export default function Sidebar() {
                     <History histories={texts} />
                 </div>
                 <div id="notify-user w-full">
-                    <p className="p-3 text-xs leading-2 text-muted-foreground">
+                    <p className="p-3 pb-0 pt-4 text-xs leading-2 text-muted-foreground">
                         Please be aware that this feature is currently experimental. We are actively working on improvements and welcome your feedback. Your
                         experience and suggestions are valuable to us in enhancing this service. Thank you for your understanding and support!
                     </p>
