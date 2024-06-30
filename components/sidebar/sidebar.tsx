@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { ChatContext, sidebarTransition } from "@/lib/context-provider";
 import Profile from "@/components/sidebar/profile";
 import History from "@/components/sidebar/history";
 import Header from "@/components/sidebar/header";
@@ -8,35 +9,22 @@ import Header from "@/components/sidebar/header";
 const texts = Array.from({ length: 10 }).map((_, i, a) => `Lorem ipsum sir dolor amet and no one could be in that`);
 
 export default function Sidebar() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isSidebarTransitioning, setIsSidebarTransitioning] = useState(false);
-
-    function sidebarTransition() {
-        setIsSidebarTransitioning(true);
-
-        setTimeout(() => setIsSidebarTransitioning(false), 500);
-    }
-
-    function openSidebar() {
-        setIsSidebarOpen(true);
-        sidebarTransition();
-    }
+    const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
 
     function closeSidebar() {
-        setIsSidebarOpen(false);
-        sidebarTransition();
+        sidebarOpen.fn(false);
+        sidebarTransition(sidebarTransitionContext);
     }
 
     return (
         <section
-            className="h-svh flex-shrink-0 transition-all duration-500"
+            className="h-svh flex-shrink-0 transition-[width] duration-300 bg-gray-950"
             style={{
-                width: isSidebarOpen ? "260px" : "0px",
-                opacity: isSidebarOpen ? "1" : "0",
-                display: isSidebarTransitioning ? "block" : isSidebarOpen ? "block" : "none",
+                width: sidebarOpen.value ? "260px" : "0px",
+                visibility: sidebarTransitionContext.value ? "visible" : sidebarOpen.value ? "visible" : "hidden",
             }}
         >
-            <nav id="sidebar" className="flex flex-col h-full p-1 w-[260px]">
+            <nav id="sidebar" className="flex flex-col h-full p-1 w-[260px] pr-2">
                 <div id="top-sidebar" className="flex justify-between items-center p-3">
                     <Header fnCloseSidebar={closeSidebar} />
                 </div>
