@@ -52,39 +52,42 @@ export default function Chat() {
     }, []);
 
     return (
-        <section className="w-full p-4 h-svh bg-gray-950 z-10 pb-1">
-            <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between h-[40px] sticky">
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={openSidebar} style={{ display: sidebarOpen.value ? "none" : "inline-flex" }}>
-                            <ArrowRightFromLine className="w-4" />
-                        </Button>
-                        <h1>Title of this chat</h1>
-                    </div>
-                    <div></div>
+        <section className="w-full h-svh bg-gray-950 z-10 pb-1 flex flex-col">
+            <div className="flex items-center justify-between p-4 py-6 pb-0">
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={openSidebar} style={{ display: sidebarOpen.value ? "none" : "inline-flex" }}>
+                        <ArrowRightFromLine className="w-4" />
+                    </Button>
+                    <h1>Title of this chat</h1>
                 </div>
-                <div role="_chat_box" className="max-w-[830px] mx-auto w-[830px] h-full flex flex-col justify-between">
-                    <div className="">Chat</div>
-                    <div role="_chat_input" className="flex flex-col items-center gap-2">
-                        <div className="w-full min-h-[56px] max-h-[200px] bg-gray-900 rounded-3xl flex items-center">
-                            <div className="px-4 w-full py-4">
-                                <Textarea
-                                    id="_prompt_area"
-                                    rows={1}
-                                    className="w-full min-h-[20px] max-h-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none items-center py-0"
-                                    placeholder="Write a message..."
-                                />
-                            </div>
-                            <div className="flex h-full mr-3 items-end justify-center py-2">
-                                <Button variant="ghost" size="icon" className="rounded-full">
-                                    <CornerDownLeft className="w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-xs">Please be aware that this feature is currently experimental.</p>
-                        </div>
+                <div></div>
+            </div>
+            <div role="_chat_box" className="h-full overflow-y-auto relative">
+                <div className="max-h-full">
+                    <div className="mx-auto max-w-[830px] w-[830px] ">
+                        Chat
                     </div>
+                </div>
+            </div>
+            <div role="_chat_input" className="flex flex-col items-center gap-2 max-w-[830px] mx-auto w-[830px] relative">
+                <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-gray-950 absolute -translate-y-full"></div>
+                <div className="w-full min-h-[56px] max-h-[200px] bg-gray-900 rounded-3xl flex items-center">
+                    <div className="px-4 w-full py-4">
+                        <Textarea
+                            id="_prompt_area"
+                            rows={1}
+                            className="w-full min-h-[20px] max-h-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none items-center py-0"
+                            placeholder="Write a message..."
+                        />
+                    </div>
+                    <div className="flex h-full mr-3 items-end justify-center py-2">
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                            <CornerDownLeft className="w-4" />
+                        </Button>
+                    </div>
+                </div>
+                <div>
+                    <p className="text-xs">Please be aware that this feature is currently experimental.</p>
                 </div>
             </div>
         </section>
