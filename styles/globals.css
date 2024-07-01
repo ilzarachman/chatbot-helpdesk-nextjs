@@ -59,6 +59,60 @@
     }
 
     .g-paragraph {
-        @apply  text-muted-foreground text-sm;
+        @apply text-muted-foreground;
+    }
+
+    .g-markdown-container {
+        @apply leading-relaxed;
+    }
+
+    .g-markdown-container p {
+        @apply mb-4;
+    }
+
+    .g-markdown-container h1 {
+        @apply text-2xl font-bold mb-4;
+    }
+
+    .g-markdown-container h1::before {
+        @apply content-['#'] text-accent font-bold mr-2;
+    }
+
+    .g-markdown-container h2 {
+        @apply text-xl font-semibold my-2;
+    }
+
+    .g-markdown-container h2::before {
+        @apply content-['##'] text-accent font-bold mr-2;
+    }
+
+    .g-markdown-container h3 {
+        @apply text-lg font-semibold my-2;
+    }
+
+    .g-markdown-container h3::before {
+        @apply content-['###'] text-accent font-bold mr-2;
+    }
+
+    .g-markdown-container code {
+        font-family: "Roboto Mono", monospace;
+        font-optical-sizing: auto;
+        @apply bg-accent px-1 rounded-sm inline-flex justify-center items-center text-muted-foreground font-normal;
+    }
+
+    .g-markdown-container a {
+        @apply text-blue-400 underline;
+    }
+
+    .g-markdown-container pre code {
+        @apply p-4 block min-w-full w-full my-4;
+    }
+
+    .g-markdown-container ul {
+        @apply list-disc list-inside mb-2;
+    }
+
+    .g-markdown-container hr {
+        @apply my-3 border-border;
     }
 }

@@ -12,7 +12,7 @@ export default function Profile({ profileName }: { profileName: string }) {
                             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
-                        <p className="font-normal text-sm">{profileName}</p>
+                        <p className="font-normal ">{profileName}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="translate-x-3">
                         <LogOut className="w-4" />

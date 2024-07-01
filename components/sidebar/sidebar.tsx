@@ -28,7 +28,7 @@ export default function Sidebar() {
                 <div id="top-sidebar" className="flex justify-between items-center p-3">
                     <Header fnCloseSidebar={closeSidebar} />
                 </div>
-                <h2 className="p-3 font-bold text-sm">History</h2>
+                <h2 className="p-3 font-bold ">History</h2>
                 <div id="history-sidebar" className="flex-col flex-1 transition-opacity duration-500 pr-2 overflow-y-auto">
                     <History histories={texts} />
                 </div>
