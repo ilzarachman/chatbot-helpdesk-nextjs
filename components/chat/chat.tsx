@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState, ChangeEvent, useRef } from "react";
 import { ChatContext, sidebarTransition } from "@/lib/context-provider";
 import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
@@ -8,9 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { convertRemToPixels } from "@/lib/utils";
 import { UserChat, BotChat } from "@/components/chat/chat-item";
+import { getChatbotResponse } from "@/lib/utils";
 
 export default function Chat() {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
+    const [history, updateHistory] = useState<Array<Array<string>>>([]);
+
+    const [isUpdatingResponse, setIsUpdatingResponse] = useState(false);
+    const [streamResponse, updateStreamResponse] = useState<string>("");
+    const streamResponseRef = useRef(streamResponse);
+    const [prompt, updatePrompt] = useState<string>("");
+    const promptRef = useRef(prompt);
 
     function openSidebar() {
         sidebarOpen.fn(true);
@@ -40,6 +48,16 @@ export default function Chat() {
         function handleKeyDownPrompt(e: KeyboardEvent) {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
+                const _prompt = promptRef.current;
+
+                setIsUpdatingResponse(true);
+                getChatbotResponse(_prompt, handleStreamedResponse, (response: string) => {
+                    updateHistory((prev) => [...prev, [_prompt, response]]);
+                    updatePrompt("");
+                    updateStreamResponse("");
+                    setIsUpdatingResponse(false);
+                });
+                return;
             }
         }
 
@@ -51,6 +69,28 @@ export default function Chat() {
             promptArea.removeEventListener("keydown", handleKeyDownPrompt);
         };
     }, []);
+
+    function handleChangePrompt(e: ChangeEvent<HTMLTextAreaElement>) {
+        const target = e.target as HTMLTextAreaElement;
+
+        updatePrompt(target.value);
+    }
+
+    function handleStreamedResponse(chunk: string) {
+        updateStreamResponse((prev) => {
+            const updatedResponse = prev + chunk;
+            streamResponseRef.current = updatedResponse;
+            return updatedResponse;
+        });
+    }
+
+    useEffect(() => {
+        promptRef.current = prompt;
+    }, [prompt]);
+
+    useEffect(() => {
+        streamResponseRef.current = streamResponse;
+    }, [streamResponse]);
 
     return (
         <section className="w-full h-svh bg-gray-950 z-10 pb-1 flex flex-col">
@@ -71,132 +111,21 @@ export default function Chat() {
             <div role="_chat_box" className="h-full overflow-y-auto relative">
                 <div className="max-h-full">
                     <div className="mx-auto max-w-[830px] w-[830px] flex flex-col">
-                        <UserChat
-                            text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Consequat semper viverra nam libero justo laoreet. Id semper risus in hendrerit gravida. In aliquam sem fringilla ut. Sit amet mattis vulputate enim. Magna etiam tempor orci eu lobortis elementum nibh tellus. Fames ac turpis egestas integer eget aliquet. Amet massa vitae tortor condimentum. Arcu cursus vitae congue mauris rhoncus aenean vel elit scelerisque. A arcu cursus vitae congue. Massa placerat duis ultricies lacus sed. Sem nulla pharetra diam sit amet. Neque egestas congue quisque egestas diam in. In hac habitasse platea dictumst vestibulum rhoncus est. Elementum eu facilisis sed odio morbi quis commodo.
+                        {history.map((item, index) => (
+                            <div key={index} data-generation={false}>
+                                <UserChat text={item[0]} />
+                                <BotChat text={item[1]} />
+                            </div>
+                        ))}
 
-Libero id faucibus nisl tincidunt. Diam ut venenatis tellus in metus vulputate eu scelerisque. Ultrices gravida dictum fusce ut placerat orci nulla. Nibh praesent tristique magna sit amet purus gravida quis blandit. Turpis cursus in hac habitasse platea dictumst quisque sagittis. Tincidunt tortor aliquam nulla facilisi cras fermentum. Id aliquet lectus proin nibh nisl condimentum id venenatis a. Amet commodo nulla facilisi nullam vehicula. Et molestie ac feugiat sed lectus vestibulum mattis. Montes nascetur ridiculus mus mauris vitae ultricies leo integer. Dictum varius duis at consectetur lorem donec massa sapien. Eget est lorem ipsum dolor sit amet consectetur. At imperdiet dui accumsan sit. Malesuada fames ac turpis egestas. Consectetur adipiscing elit ut aliquam purus sit. Dignissim enim sit amet venenatis urna. Elit scelerisque mauris pellentesque pulvinar pellentesque. Eu mi bibendum neque egestas congue quisque egestas diam. Facilisis sed odio morbi quis commodo odio."
-                        />
-                        <BotChat
-                            text={`# A demo of \`react-markdown\`
-
-\`react-markdown\` is a markdown component for React.
-
-👉 Changes are re-rendered as you type.
-
-👈 Try writing some markdown on the left.
-
-## Overview
-
-* Follows [CommonMark](https://commonmark.org)
-* Optionally follows [GitHub Flavored Markdown](https://github.github.com/gfm/)
-* Renders actual React elements instead of using \`dangerouslySetInnerHTML\`
-* Lets you define your own components (to render \`MyHeading\` instead of \`'h1'\`)
-* Has a lot of plugins
-
-## Contents
-
-Here is an example of a plugin in action
-([\`remark-toc\`](https://github.com/remarkjs/remark-toc)).
-**This section is replaced by an actual table of contents**.
-
-## Syntax highlighting
-
-Here is an example of a plugin to highlight code:
-[\`rehype-highlight\`](https://github.com/rehypejs/rehype-highlight).
-
-\`\`\`js
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Markdown from 'react-markdown'
-import rehypeHighlight from 'rehype-highlight'
-
-const markdown = \`
-# Your markdown here
-\`
-
-ReactDOM.render(
-  <Markdown rehypePlugins={[rehypeHighlight]}>{markdown}</Markdown>,
-  document.querySelector('#content')
-)
-\`\`\`
-
-Pretty neat, eh?
-
-## GitHub flavored markdown (GFM)
-
-For GFM, you can *also* use a plugin:
-[\`remark-gfm\`](https://github.com/remarkjs/react-markdown#use).
-It adds support for GitHub-specific extensions to the language:
-tables, strikethrough, tasklists, and literal URLs.
-
-These features **do not work by default**.
-👆 Use the toggle above to add the plugin.
-
-| Feature    | Support              |
-| ---------: | :------------------- |
-| CommonMark | 100%                 |
-| GFM        | 100% w/ \`remark-gfm\` |
-
-~~strikethrough~~
-
-* [ ] task list
-* [x] checked item
-
-https://example.com
-
-## HTML in markdown
-
-⚠️ HTML in markdown is quite unsafe, but if you want to support it, you can
-use [\`rehype-raw\`](https://github.com/rehypejs/rehype-raw).
-You should probably combine it with
-[\`rehype-sanitize\`](https://github.com/rehypejs/rehype-sanitize).
-
-<blockquote>
-  👆 Use the toggle above to add the plugin.
-</blockquote>
-
-## Components
-
-You can pass components to change things:
-
-\`\`\`js
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Markdown from 'react-markdown'
-import MyFancyRule from './components/my-fancy-rule.js'
-
-const markdown = \`
-# Your markdown here
-\`
-
-ReactDOM.render(
-  <Markdown
-    components={{
-      // Use h2s instead of h1s
-      h1: 'h2',
-      // Use a component instead of hrs
-      hr(props) {
-        const {node, ...rest} = props
-        return <MyFancyRule {...rest} />
-      }
-    }}
-  >
-    {markdown}
-  </Markdown>,
-  document.querySelector('#content')
-)
-\`\`\`
-
-## More info?
-
-Much more info is available in the
-[readme on GitHub](https://github.com/remarkjs/react-markdown)!
-
-***
-
-A component by [Espen Hovlandsdal](https://espen.codes/)
-`}
-                        />
+                        {isUpdatingResponse ? (
+                            <div data-generation>
+                                <UserChat text={prompt} />
+                                <BotChat text={streamResponse} />
+                            </div>
+                        ) : (
+                            ""
+                        )}
                     </div>
                 </div>
             </div>
@@ -209,6 +138,7 @@ A component by [Espen Hovlandsdal](https://espen.codes/)
                             rows={1}
                             className="w-full min-h-[20px] max-h-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none items-center py-0"
                             placeholder="Write a message..."
+                            onChange={handleChangePrompt}
                         />
                     </div>
                     <div className="flex h-full mr-3 items-end justify-center py-2">

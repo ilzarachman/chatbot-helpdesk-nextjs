@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 export function UserChat({ text }: { text: string }) {
     return (
         <>
-            <div className="p-7 max-w-3xl flex gap-5 w-full min-w-full bg-muted border-2 border-gray-800 rounded-3xl pr-14 pb-9">
+            <div className="p-7 max-w-3xl flex gap-5 w-full min-w-full bg-muted rounded-3xl pr-14 ">
                 <Avatar>
                     <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                     <AvatarFallback>CN</AvatarFallback>
