@@ -58,12 +58,27 @@
         @apply bg-background text-foreground;
     }
 
+    @keyframes slow-opacity {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
     .g-paragraph {
         @apply text-muted-foreground;
     }
 
     .g-markdown-container {
         @apply leading-relaxed;
+    }
+
+    .g-markdown-container[data-generation="true"] * {
+        animation-name: slow-opacity;
+        animation-duration: 1s;
     }
 
     .g-markdown-container p {

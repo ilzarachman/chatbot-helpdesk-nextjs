@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState, ChangeEvent, useRef } from "react";
+import React, { useContext, useEffect, useState, ChangeEvent, useRef, LegacyRef } from "react";
 import { ChatContext, sidebarTransition } from "@/lib/context-provider";
 import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
@@ -14,6 +14,8 @@ export default function Chat() {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
 
+    const promptArea = useRef<HTMLTextAreaElement>(null);
+
     const [isUpdatingResponse, setIsUpdatingResponse] = useState(false);
     const [streamResponse, updateStreamResponse] = useState<string>("");
     const streamResponseRef = useRef(streamResponse);
@@ -26,11 +28,10 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        const promptArea: HTMLTextAreaElement = document.getElementById("_prompt_area") as HTMLTextAreaElement;
-
-        promptArea.style.height = "auto";
-        promptArea.style.height = promptArea.scrollHeight + "px";
-        promptArea.style.overflowY = "hidden";
+        const _promptArea = promptArea.current as HTMLTextAreaElement;
+        _promptArea.style.height = "auto";
+        _promptArea.style.height = _promptArea.scrollHeight + "px";
+        _promptArea.style.overflowY = "hidden";
 
         const _75rem = convertRemToPixels(0.75);
 
@@ -48,6 +49,7 @@ export default function Chat() {
         function handleKeyDownPrompt(e: KeyboardEvent) {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
+                _promptArea.value = "";
                 const _prompt = promptRef.current;
 
                 setIsUpdatingResponse(true);
@@ -61,12 +63,12 @@ export default function Chat() {
             }
         }
 
-        promptArea.addEventListener("input", handleInputPrompt, false);
-        promptArea.addEventListener("keydown", handleKeyDownPrompt, false);
+        _promptArea.addEventListener("input", handleInputPrompt, false);
+        _promptArea.addEventListener("keydown", handleKeyDownPrompt, false);
 
         return () => {
-            promptArea.removeEventListener("input", handleInputPrompt);
-            promptArea.removeEventListener("keydown", handleKeyDownPrompt);
+            _promptArea.removeEventListener("input", handleInputPrompt);
+            _promptArea.removeEventListener("keydown", handleKeyDownPrompt);
         };
     }, []);
 
@@ -92,6 +94,14 @@ export default function Chat() {
         streamResponseRef.current = streamResponse;
     }, [streamResponse]);
 
+    useEffect(() => {
+        if (isUpdatingResponse) {
+            promptArea.current?.setAttribute("disabled", "true");
+        } else {
+            promptArea.current?.removeAttribute("disabled");
+        }
+    }, [isUpdatingResponse]);
+
     return (
         <section className="w-full h-svh bg-gray-950 z-10 pb-1 flex flex-col">
             <div className="flex items-center justify-center p-4 py-6 relative">
@@ -114,14 +124,14 @@ export default function Chat() {
                         {history.map((item, index) => (
                             <div key={index} data-generation={false}>
                                 <UserChat text={item[0]} />
-                                <BotChat text={item[1]} />
+                                <BotChat text={item[1]} generation={false} />
                             </div>
                         ))}
 
                         {isUpdatingResponse ? (
                             <div data-generation>
                                 <UserChat text={prompt} />
-                                <BotChat text={streamResponse} />
+                                <BotChat text={streamResponse} generation={true} />
                             </div>
                         ) : (
                             ""
@@ -131,7 +141,12 @@ export default function Chat() {
             </div>
             <div role="_chat_input" className="flex flex-col items-center gap-2 max-w-[830px] mx-auto w-[830px] relative">
                 <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-gray-950 absolute -translate-y-full"></div>
-                <div className="w-full min-h-[56px] max-h-[200px] bg-gray-900 rounded-3xl flex items-center">
+                <div
+                    className="w-full min-h-[56px] max-h-[200px] bg-gray-900 rounded-3xl flex items-center group hover:cursor-text"
+                    onClick={() => {
+                        promptArea.current?.focus();
+                    }}
+                >
                     <div className="px-4 w-full py-4">
                         <Textarea
                             id="_prompt_area"
@@ -139,6 +154,7 @@ export default function Chat() {
                             className="w-full min-h-[20px] max-h-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none items-center py-0"
                             placeholder="Write a message..."
                             onChange={handleChangePrompt}
+                            ref={promptArea}
                         />
                     </div>
                     <div className="flex h-full mr-3 items-end justify-center py-2">
