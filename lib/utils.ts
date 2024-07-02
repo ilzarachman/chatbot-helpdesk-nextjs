@@ -48,3 +48,15 @@ export async function getChatbotResponse(prompt: string, updateValue: (value: st
         console.error(error);
     }
 }
+
+export function splitStringIntoChars(string: string): string[] {
+    const characters = [];
+    const regex = /[\s\S]/g;
+
+    let match;
+    while ((match = regex.exec(string)) !== null) {
+        characters.push(match[0]);
+    }
+
+    return characters
+}

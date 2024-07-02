@@ -6,9 +6,26 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { convertRemToPixels } from "@/lib/utils";
+import { convertRemToPixels, splitStringIntoChars } from "@/lib/utils";
 import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
+import { motion, Variants } from "framer-motion";
+
+const headerText = "Ahoy matey! Welcome aboard! What's on yer mind?";
+const descriptionHeaderText =
+    "Hai! Selamat datang! Aku adalah asisten chatbot kampus. Kamu bisa tanya apa saja yang berhubungan dengan kampus, mulai dari informasi akademik, kegiatan mahasiswa, fasilitas, hingga jadwal acara. Aku juga siap menerima masukan atau saran yang kamu punya. Mulai ngobrol aja kalau sudah siap. Ada yang bisa aku bantu hari ini?";
+
+const headerAppearVariants: Variants = {
+    hidden: {
+        opacity: 0,
+    },
+    visible: {
+        opacity: 1,
+    },
+};
+
+const headerChars = splitStringIntoChars(headerText);
+const descriptionHeaderChars = splitStringIntoChars(descriptionHeaderText);
 
 export default function Chat() {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
@@ -115,12 +132,44 @@ export default function Chat() {
                     >
                         <ArrowRightFromLine className="w-4" />
                     </Button>
-                    <h1 className="font-bold">Title of this chat</h1>
+                    <h1 className="font-bold invisible">Title of this chat</h1>
                 </div>
             </div>
             <div role="_chat_box" className="h-full overflow-y-auto relative">
                 <div className="max-h-full">
-                    <div className="mx-auto max-w-[830px] w-[830px] flex flex-col">
+                    <div className={`mx-auto max-w-[830px] w-[830px] flex flex-col ${history.length === 0 && !isUpdatingResponse ? "items-center" : ""}`}>
+                        {history.length === 0 && !isUpdatingResponse ? (
+                            <div className="w-[120%] max-w-[150%] mt-10">
+                                <motion.h1
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    transition={{ staggerChildren: 0.015 }}
+                                    className="font-bold text-8xl leading-[0.95] pb-2 "
+                                >
+                                    {headerChars.map((char, index) => (
+                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeInOut" }} variants={headerAppearVariants}>
+                                            {char}
+                                        </motion.span>
+                                    ))}
+                                </motion.h1>
+
+                                <motion.p
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    transition={{ staggerChildren: 0.0015 }}
+                                    className="text-muted-foreground w-[70%] mt-4"
+                                >
+                                    {descriptionHeaderChars.map((char, index) => (
+                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeInOut" }} variants={headerAppearVariants}>
+                                            {char}
+                                        </motion.span>
+                                    ))}
+                                </motion.p>
+                            </div>
+                        ) : (
+                            ""
+                        )}
+
                         {history.map((item, index) => (
                             <div key={index} data-generation={false}>
                                 <UserChat text={item[0]} />

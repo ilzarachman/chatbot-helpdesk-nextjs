@@ -58,6 +58,31 @@
         @apply bg-background text-foreground;
     }
 
+    /* width */
+    ::-webkit-scrollbar {
+        @apply w-2;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        @apply bg-transparent;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        @apply bg-muted rounded-full;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        @apply bg-muted-foreground;
+    }
+
+    .typewriter span {
+        opacity: 0;
+        display: inline-block;
+    }
+
     @keyframes slow-opacity {
         from {
             opacity: 0;
@@ -125,6 +150,10 @@
 
     .g-markdown-container ul {
         @apply list-disc list-inside mb-4;
+    }
+
+    .g-markdown-container ul li p {
+        @apply inline-block;
     }
 
     .g-markdown-container ol {
