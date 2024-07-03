@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { convertRemToPixels, splitStringIntoChars } from "@/lib/utils";
+import { convertRemToPixels, saveSidebarState, splitStringIntoChars } from "@/lib/utils";
 import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
@@ -18,9 +18,11 @@ const descriptionHeaderText =
 const headerAppearVariants: Variants = {
     hidden: {
         opacity: 0,
+        transform: "translateY(-100px)",
     },
     visible: {
         opacity: 1,
+        transform: "translateY(0px)",
     },
 };
 
@@ -32,6 +34,7 @@ export default function Chat() {
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
 
     const promptArea = useRef<HTMLTextAreaElement>(null);
+    const chatBoxScrollRef = useRef<HTMLDivElement>(null);
 
     const [isUpdatingResponse, setIsUpdatingResponse] = useState(false);
     const [streamResponse, updateStreamResponse] = useState<string>("");
@@ -42,6 +45,7 @@ export default function Chat() {
     function openSidebar() {
         sidebarOpen.fn(true);
         sidebarTransition(sidebarTransitionContext);
+        saveSidebarState(true);
     }
 
     useEffect(() => {
@@ -69,6 +73,10 @@ export default function Chat() {
                 _promptArea.value = "";
                 const _prompt = promptRef.current;
 
+                if (_prompt === "") {
+                    return;
+                }
+
                 setIsUpdatingResponse(true);
                 getChatbotResponse(_prompt, handleStreamedResponse, (response: string) => {
                     updateHistory((prev) => [...prev, [_prompt, response]]);
@@ -76,6 +84,7 @@ export default function Chat() {
                     updateStreamResponse("");
                     setIsUpdatingResponse(false);
                 });
+                chatBoxScrollRef.current?.scrollTo(0, chatBoxScrollRef.current.scrollHeight);
                 return;
             }
         }
@@ -135,11 +144,11 @@ export default function Chat() {
                     <h1 className="font-bold invisible">Title of this chat</h1>
                 </div>
             </div>
-            <div role="_chat_box" className="h-full overflow-y-auto relative">
+            <div role="_chat_box" className="h-full overflow-y-auto relative" ref={chatBoxScrollRef}>
                 <div className="max-h-full">
                     <div className={`mx-auto max-w-[830px] w-[830px] flex flex-col ${history.length === 0 && !isUpdatingResponse ? "items-center" : ""}`}>
                         {history.length === 0 && !isUpdatingResponse ? (
-                            <div className="w-[120%] max-w-[150%] mt-10">
+                            <div className="w-full mt-10">
                                 <motion.h1
                                     initial="hidden"
                                     whileInView="visible"
@@ -147,7 +156,7 @@ export default function Chat() {
                                     className="font-bold text-8xl leading-[0.95] pb-2 "
                                 >
                                     {headerChars.map((char, index) => (
-                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeInOut" }} variants={headerAppearVariants}>
+                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
                                             {char}
                                         </motion.span>
                                     ))}
@@ -160,7 +169,7 @@ export default function Chat() {
                                     className="text-muted-foreground w-[70%] mt-4"
                                 >
                                     {descriptionHeaderChars.map((char, index) => (
-                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeInOut" }} variants={headerAppearVariants}>
+                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
                                             {char}
                                         </motion.span>
                                     ))}

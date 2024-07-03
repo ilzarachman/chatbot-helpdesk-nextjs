@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { ChatContext, sidebarTransition } from "@/lib/context-provider";
 import Profile from "@/components/sidebar/profile";
 import History from "@/components/sidebar/history";
 import Header from "@/components/sidebar/header";
+import { saveSidebarState, getSidebarState } from "@/lib/utils";
 
 const texts = Array.from({ length: 10 }).map((_, i, a) => `Lorem ipsum sir dolor amet and no one could be in that`);
 
@@ -14,6 +15,7 @@ export default function Sidebar() {
     function closeSidebar() {
         sidebarOpen.fn(false);
         sidebarTransition(sidebarTransitionContext);
+        saveSidebarState(false);
     }
 
     return (

@@ -5,9 +5,10 @@ import { ChatContext } from "@/lib/context-provider";
 import { Separator } from "@/components/ui/separator";
 import Sidebar from "@/components/sidebar/sidebar";
 import Chat from "@/components/chat/chat";
+import { getSidebarState } from "@/lib/utils";
 
 export default function Home() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(getSidebarState());
     const [isSidebarTransitioning, setIsSidebarTransitioning] = useState(false);
 
     return (

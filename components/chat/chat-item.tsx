@@ -33,7 +33,9 @@ export function BotChat({ text, generation }: { text: string; generation: boolea
                 {text != "" ? (
                     <div className="flex flex-col gap-2">
                         <div className="pt-2 g-markdown-container" data-generation={generation}>
-                            <Markdown remarkPlugins={[remarkGfm]}>{text}</Markdown>
+                            <Markdown remarkPlugins={[remarkGfm]}>
+                                {text}
+                            </Markdown>
                         </div>
                         {!generation ? <ThumbsUp className="w-6 h-6" /> : ""}
                     </div>

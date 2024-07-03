@@ -58,5 +58,15 @@ export function splitStringIntoChars(string: string): string[] {
         characters.push(match[0]);
     }
 
-    return characters
+    return characters;
+}
+
+
+export function saveSidebarState(sidebarOpen: boolean) {
+    localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
+}
+
+export function getSidebarState(): boolean {
+    const sidebarOpen = JSON.parse(localStorage.getItem("sidebarOpen") ?? "false");
+    return sidebarOpen;
 }
