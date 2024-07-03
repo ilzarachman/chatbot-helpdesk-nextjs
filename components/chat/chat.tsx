@@ -11,18 +11,16 @@ import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
 
-const headerText = "Ahoy matey! Welcome aboard! What's on yer mind?";
+const headerText = "Hai, Selamat datang! Apa yang bisa aku bantu?";
 const descriptionHeaderText =
-    "Hai! Selamat datang! Aku adalah asisten chatbot kampus. Kamu bisa tanya apa saja yang berhubungan dengan kampus, mulai dari informasi akademik, kegiatan mahasiswa, fasilitas, hingga jadwal acara. Aku juga siap menerima masukan atau saran yang kamu punya. Mulai ngobrol aja kalau sudah siap. Ada yang bisa aku bantu hari ini?";
+    "Aku adalah asisten chatbot kampus. Kamu bisa tanya apa saja yang berhubungan dengan kampus, mulai dari informasi akademik, kegiatan mahasiswa, fasilitas, hingga jadwal acara. Aku juga siap menerima masukan atau saran yang kamu punya.";
 
 const headerAppearVariants: Variants = {
     hidden: {
         opacity: 0,
-        transform: "translateY(-100px)",
     },
     visible: {
         opacity: 1,
-        transform: "translateY(0px)",
     },
 };
 
@@ -153,7 +151,7 @@ export default function Chat() {
                                     initial="hidden"
                                     whileInView="visible"
                                     transition={{ staggerChildren: 0.015 }}
-                                    className="font-bold text-8xl leading-[0.95] pb-2 "
+                                    className="font-bold text-8xl leading-[1] pb-2 text-foreground"
                                 >
                                     {headerChars.map((char, index) => (
                                         <motion.span key={index} transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
