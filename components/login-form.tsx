@@ -2,15 +2,17 @@
 
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { set, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Router, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
+import { fetchAPI } from "@/lib/utils";
 
 const studentNumberPlaceholder = "Enter your student number";
 
@@ -20,6 +22,9 @@ const loginSchema = z.object({
 });
 
 export default function LoginForm() {
+    const [loadingLogin, setLoadingLogin] = React.useState(false);
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -30,6 +35,43 @@ export default function LoginForm() {
 
     function onSubmit(values: z.infer<typeof loginSchema>) {
         console.log(values);
+        const login = async () => {
+            setLoadingLogin(true);
+            try {
+                const res = await fetchAPI("/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        student_number: values.studentNumber,
+                        password: values.password,
+                    }),
+                    credentials: "include",
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        console.log("success");
+                        router.push("/");
+                    }
+                } else {
+                    alert("Failed to login! Please try again.");
+                    setLoadingLogin(false);
+                }
+            } catch (error) {
+                console.error("Failed to login", error);
+                alert("Failed to login! Please try again.");
+                setLoadingLogin(false);
+            }
+        };
+
+        if (values.studentNumber && values.password) {
+            login();
+        } else {
+            console.log("failed");
+            alert("Please enter both student number and password");
+        }
     }
 
     return (
@@ -61,18 +103,19 @@ export default function LoginForm() {
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Password" {...field} />
+                                        <Input placeholder="Password" type="password" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button variant="default" type="submit" className="px-6">Login <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                        <Button variant="default" type="submit" className="px-6" disabled={loadingLogin}>
+                            Login
+                            {loadingLogin ? <LoaderCircle className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Button>
                     </form>
                 </Form>
-                <p className="g-paragraph [&:not(:first-child)]:mt-6 text-xs">
-                    *If you don't have an account, please contact your supervisor.
-                </p>
+                <p className="g-paragraph [&:not(:first-child)]:mt-6 text-xs">*If you don't have an account, please contact your supervisor.</p>
             </CardContent>
         </Card>
     );
