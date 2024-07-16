@@ -39,14 +39,15 @@ export async function fetchAPI(input: string | URL, init?: RequestInit) {
  * @param {(value: string) => void} [afterEffect] - An optional callback function that is called after the response is complete.
  * @return {Promise<void>} A Promise that resolves when the response is complete.
  */
-export async function getChatbotResponse(prompt: string, updateValue: (value: string) => void, afterEffect?: (value: string) => void) {
+export async function getChatbotResponse(data: { message: string; conversation_uuid: string }, updateValue: (value: string) => void, afterEffect?: (value: string) => void) {
     try {
         const response = await fetchAPI(`/chat/prompt`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: prompt }),
+            body: JSON.stringify(data),
+            credentials: "include",
         });
 
         const reader = (response.body as ReadableStream<Uint8Array>)?.getReader();

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { convertRemToPixels, saveSidebarState, splitStringIntoChars } from "@/lib/utils";
+import { convertRemToPixels, fetchAPI, saveSidebarState, splitStringIntoChars } from "@/lib/utils";
 import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
@@ -27,9 +27,10 @@ const headerAppearVariants: Variants = {
 const headerChars = splitStringIntoChars(headerText);
 const descriptionHeaderChars = splitStringIntoChars(descriptionHeaderText);
 
-export default function Chat() {
+export default function Chat({ conversationUUID = null }: { conversationUUID?: string | null }) {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
+    const [uuid, updateUUID] = useState(conversationUUID);
 
     const promptArea = useRef<HTMLTextAreaElement>(null);
     const chatBoxScrollRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,38 @@ export default function Chat() {
         sidebarTransition(sidebarTransitionContext);
         saveSidebarState(true);
     }
+
+    async function getMessages(conversationUUID: string) {
+        const res = await fetchAPI(`/chat/conversation/messages/${conversationUUID}`, {
+            method: "GET",
+            credentials: "include",
+        });
+        const data = await res.json();
+        const messages = data.data.messages;
+        updateHistory([]);
+        messages.forEach((message: { user: string; assistant: string; }) => {
+            updateHistory((prev) => [...prev, [message.user, message.assistant]]);
+        });
+    }
+
+    async function createNewConversation(message: string) {
+        const res = await fetchAPI("/chat/conversation/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ assistant_message: message }),
+            credentials: "include",
+        });
+        const data = await res.json();
+        updateUUID(data.data.uuid);
+    }
+
+    useEffect(() => {
+        if (conversationUUID) {
+            getMessages(conversationUUID);
+        }
+    }, [conversationUUID]);
 
     useEffect(() => {
         const _promptArea = promptArea.current as HTMLTextAreaElement;
@@ -76,11 +109,14 @@ export default function Chat() {
                 }
 
                 setIsUpdatingResponse(true);
-                getChatbotResponse(_prompt, handleStreamedResponse, (response: string) => {
+                getChatbotResponse({ message: _prompt, conversation_uuid: uuid ? uuid : "" }, handleStreamedResponse, (response: string) => {
                     updateHistory((prev) => [...prev, [_prompt, response]]);
                     updatePrompt("");
                     updateStreamResponse("");
                     setIsUpdatingResponse(false);
+                    if (!conversationUUID) {
+                        createNewConversation(response);
+                    }
                 });
                 chatBoxScrollRef.current?.scrollTo(0, chatBoxScrollRef.current.scrollHeight);
                 return;
@@ -145,7 +181,7 @@ export default function Chat() {
             <div role="_chat_box" className="h-full overflow-y-auto relative" ref={chatBoxScrollRef}>
                 <div className="max-h-full">
                     <div className={`mx-auto max-w-[830px] w-[830px] flex flex-col ${history.length === 0 && !isUpdatingResponse ? "items-center" : ""}`}>
-                        {history.length === 0 && !isUpdatingResponse ? (
+                        {history.length === 0 && !isUpdatingResponse && !conversationUUID ? (
                             <div className="w-full mt-10">
                                 <motion.h1
                                     initial="hidden"

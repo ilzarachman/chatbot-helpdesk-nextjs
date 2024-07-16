@@ -8,7 +8,7 @@ import Chat from "@/components/chat/chat";
 import { getSidebarState } from "@/lib/utils";
 import Loading from "@/components/loading";
 
-export default function Home() {
+export default function Home({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSidebarTransitioning, setIsSidebarTransitioning] = useState(false);
 
@@ -27,7 +27,7 @@ export default function Home() {
                 <main className="flex min-h-screen items-center justify-between relative">
                     <Sidebar />
                     <Separator orientation="vertical" className="h-svh" />
-                    <Chat />
+                    {children}
                 </main>
             </ChatContext.Provider>
         </Suspense>
