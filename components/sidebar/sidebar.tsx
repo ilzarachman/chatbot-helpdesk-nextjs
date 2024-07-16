@@ -58,7 +58,7 @@ export default function Sidebar() {
                 </div>
                 <h2 className="p-3 font-bold ">History</h2>
                 <div id="history-sidebar" className="flex-col flex-1 transition-opacity duration-500 pr-2 overflow-y-auto">
-                    <History histories={conversations} />
+                    <History histories={conversations} updateHistory={getConversations} />
                 </div>
                 <div id="notify-user w-full">
                     <p className="p-3 pb-0 pt-4 text-xs leading-2 text-muted-foreground">

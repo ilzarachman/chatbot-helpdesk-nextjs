@@ -9,6 +9,10 @@ type ChatContextValue = {
         value: boolean;
         fn: (value: boolean) => void;
     };
+    newConvHistory: {
+        value: {title: string, uuid: string};
+        fn: (value: {title: string, uuid: string}) => void; 
+    }
 };
 
 export const ChatContext = createContext({} as ChatContextValue);

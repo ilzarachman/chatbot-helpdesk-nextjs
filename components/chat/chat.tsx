@@ -10,6 +10,7 @@ import { convertRemToPixels, fetchAPI, saveSidebarState, splitStringIntoChars } 
 import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
+import { Link, animateScroll as scroll } from "react-scroll";
 
 const headerText = "Hai, Selamat datang! Apa yang bisa aku bantu?";
 const descriptionHeaderText =
@@ -27,10 +28,11 @@ const headerAppearVariants: Variants = {
 const headerChars = splitStringIntoChars(headerText);
 const descriptionHeaderChars = splitStringIntoChars(descriptionHeaderText);
 
-export default function Chat({ conversationUUID = null }: { conversationUUID?: string | null }) {
-    const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
+export default function Chat({ conversationUUID = "" }: { conversationUUID?: string }) {
+    const { sidebarOpen, sidebarTransition: sidebarTransitionContext, newConvHistory } = useContext(ChatContext);
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
     const [uuid, updateUUID] = useState(conversationUUID);
+    const uuidRef = useRef(uuid);
 
     const promptArea = useRef<HTMLTextAreaElement>(null);
     const chatBoxScrollRef = useRef<HTMLDivElement>(null);
@@ -60,7 +62,7 @@ export default function Chat({ conversationUUID = null }: { conversationUUID?: s
         });
     }
 
-    async function createNewConversation(message: string) {
+    async function createNewConversation(message: string, userPrompt: string) {
         const res = await fetchAPI("/chat/conversation/new", {
             method: "POST",
             headers: {
@@ -70,8 +72,25 @@ export default function Chat({ conversationUUID = null }: { conversationUUID?: s
             credentials: "include",
         });
         const data = await res.json();
-        updateUUID(data.data.uuid);
+        updateUUID((prev) => data.data.uuid);
+        newConvHistory.fn({title: data.data.name, uuid: data.data.uuid});
+        await addMessagesToConversation(data.data.uuid, userPrompt, message);
     }
+
+    async function addMessagesToConversation(conversationUUID: string, userMessage: string, assistantMessage: string) {
+        const res = await fetchAPI('/chat/store', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ conversation_uuid: conversationUUID, user_message: userMessage, assistant_message: assistantMessage }),
+            credentials: 'include',
+        })
+    }
+
+    useEffect(() => {
+        uuidRef.current = uuid;
+    }, [uuid]);
 
     useEffect(() => {
         if (conversationUUID) {
@@ -110,15 +129,20 @@ export default function Chat({ conversationUUID = null }: { conversationUUID?: s
 
                 setIsUpdatingResponse(true);
                 getChatbotResponse({ message: _prompt, conversation_uuid: uuid ? uuid : "" }, handleStreamedResponse, (response: string) => {
+                    if (!conversationUUID && uuidRef.current === "") {
+                        console.log("Starting new conversation!");
+                        createNewConversation(response, _prompt);
+                    }
+
+                    if (uuidRef.current !== "") {
+                        addMessagesToConversation(uuidRef.current, _prompt, response);
+                    }
+
                     updateHistory((prev) => [...prev, [_prompt, response]]);
                     updatePrompt("");
                     updateStreamResponse("");
                     setIsUpdatingResponse(false);
-                    if (!conversationUUID) {
-                        createNewConversation(response);
-                    }
                 });
-                chatBoxScrollRef.current?.scrollTo(0, chatBoxScrollRef.current.scrollHeight);
                 return;
             }
         }
@@ -155,6 +179,20 @@ export default function Chat({ conversationUUID = null }: { conversationUUID?: s
     }, [streamResponse]);
 
     useEffect(() => {
+        if (!isUpdatingResponse) {
+            return;
+        }
+
+        const element = chatBoxScrollRef.current as HTMLDivElement;
+
+        element.scrollTo({
+            top: element.scrollHeight,
+            behavior: "smooth",
+        })
+
+    }, [isUpdatingResponse]);
+
+    useEffect(() => {
         if (isUpdatingResponse) {
             promptArea.current?.setAttribute("disabled", "true");
         } else {
@@ -178,7 +216,7 @@ export default function Chat({ conversationUUID = null }: { conversationUUID?: s
                     <h1 className="font-bold invisible">Title of this chat</h1>
                 </div>
             </div>
-            <div role="_chat_box" className="h-full overflow-y-auto relative" ref={chatBoxScrollRef}>
+            <div role="_chat_box" className="h-full overflow-y-scroll relative" ref={chatBoxScrollRef}>
                 <div className="max-h-full">
                     <div className={`mx-auto max-w-[830px] w-[830px] flex flex-col ${history.length === 0 && !isUpdatingResponse ? "items-center" : ""}`}>
                         {history.length === 0 && !isUpdatingResponse && !conversationUUID ? (

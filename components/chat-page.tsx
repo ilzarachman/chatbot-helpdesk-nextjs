@@ -11,6 +11,7 @@ import Loading from "@/components/loading";
 export default function Home({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSidebarTransitioning, setIsSidebarTransitioning] = useState(false);
+    const [newConvHistory, setNewConvHistory] = useState({title: "", uuid: ""});
 
     useEffect(() => {
         setIsSidebarOpen(getSidebarState());
@@ -22,6 +23,7 @@ export default function Home({ children }: { children: React.ReactNode }) {
                 value={{
                     sidebarOpen: { value: isSidebarOpen, fn: setIsSidebarOpen },
                     sidebarTransition: { value: isSidebarTransitioning, fn: setIsSidebarTransitioning },
+                    newConvHistory: { value: newConvHistory, fn: setNewConvHistory },
                 }}
             >
                 <main className="flex min-h-screen items-center justify-between relative">
