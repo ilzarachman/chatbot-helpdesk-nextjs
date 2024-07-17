@@ -19,7 +19,7 @@ export default function Sidebar() {
     const [conversations, setConversations] = useState<Conversation[]>([]);
 
     function getConversations() {
-        return fetchAPI("/chat/conversation/all", {
+        return fetchAPI("/conversation/all", {
             method: "GET",
             credentials: "include",
         })

@@ -50,7 +50,7 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
     }
 
     async function getMessages(conversationUUID: string) {
-        const res = await fetchAPI(`/chat/conversation/messages/${conversationUUID}`, {
+        const res = await fetchAPI(`/conversation/messages/${conversationUUID}`, {
             method: "GET",
             credentials: "include",
         });
@@ -63,7 +63,7 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
     }
 
     async function createNewConversation(message: string, userPrompt: string) {
-        const res = await fetchAPI("/chat/conversation/new", {
+        const res = await fetchAPI("/conversation/new", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
                 }
 
                 setIsUpdatingResponse(true);
-                getChatbotResponse({ message: _prompt, conversation_uuid: uuid ? uuid : "" }, handleStreamedResponse, (response: string) => {
+                getChatbotResponse({ message: _prompt, conversation_uuid: uuidRef.current }, handleStreamedResponse, (response: string) => {
                     if (!conversationUUID && uuidRef.current === "") {
                         console.log("Starting new conversation!");
                         createNewConversation(response, _prompt);

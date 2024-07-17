@@ -83,7 +83,7 @@
         display: inline-block;
     }
 
-    @keyframes slow-opacity {
+    /* @keyframes slow-opacity {
         from {
             opacity: 0;
         }
@@ -91,10 +91,15 @@
         to {
             opacity: 1;
         }
-    }
+    } */
 
     .g-paragraph {
         @apply text-muted-foreground;
+    }
+
+    @keyframes text-in {
+        from { opacity: 0; transform: translateY(3px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .g-markdown-container {
@@ -102,8 +107,7 @@
     }
 
     .g-markdown-container[data-generation="true"] * {
-        animation-name: slow-opacity;
-        animation-duration: 1s;
+        animation: text-in 1s ease-in-out;
     }
 
     .g-markdown-container p {
