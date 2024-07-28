@@ -29,7 +29,7 @@ const headerChars = splitStringIntoChars(headerText);
 const descriptionHeaderChars = splitStringIntoChars(descriptionHeaderText);
 
 export default function Chat({ conversationUUID = "" }: { conversationUUID?: string }) {
-    const { sidebarOpen, sidebarTransition: sidebarTransitionContext, newConvHistory } = useContext(ChatContext);
+    const { sidebarOpen, sidebarTransition: sidebarTransitionContext, newConvHistory, chatKey } = useContext(ChatContext);
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
     const [uuid, updateUUID] = useState(conversationUUID);
     const uuidRef = useRef(uuid);
@@ -199,6 +199,11 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
             promptArea.current?.removeAttribute("disabled");
         }
     }, [isUpdatingResponse]);
+
+    useEffect(() => {
+        updateHistory([]);
+        updateUUID("");
+    }, [chatKey.value]);
 
     return (
         <section className="w-full h-svh bg-gray-950 z-10 pb-1 flex flex-col">

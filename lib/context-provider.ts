@@ -12,7 +12,11 @@ type ChatContextValue = {
     newConvHistory: {
         value: {title: string, uuid: string};
         fn: (value: {title: string, uuid: string}) => void; 
-    }
+    };
+    chatKey: {
+        value: number;
+        fn: (value: number | ((prev: number) => number)) => void;
+    };
 };
 
 export const ChatContext = createContext({} as ChatContextValue);

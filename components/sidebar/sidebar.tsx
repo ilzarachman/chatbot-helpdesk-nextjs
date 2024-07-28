@@ -5,7 +5,11 @@ import { ChatContext, sidebarTransition } from "@/lib/context-provider";
 import Profile from "@/components/sidebar/profile";
 import History from "@/components/sidebar/history";
 import Header from "@/components/sidebar/header";
+import { Button } from "@/components/ui/button";
+import { Plus } from 'lucide-react';
 import { saveSidebarState, getSidebarState, fetchAPI } from "@/lib/utils";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 
 type Conversation = {
@@ -15,8 +19,10 @@ type Conversation = {
 }
 
 export default function Sidebar() {
-    const { sidebarOpen, sidebarTransition: sidebarTransitionContext } = useContext(ChatContext);
+    const { sidebarOpen, sidebarTransition: sidebarTransitionContext, chatKey } = useContext(ChatContext);
     const [conversations, setConversations] = useState<Conversation[]>([]);
+
+    const router = useRouter();
 
     function getConversations() {
         return fetchAPI("/conversation/all", {
@@ -29,7 +35,7 @@ export default function Sidebar() {
                 console.log(conversations);
                 setConversations([]);
                 conversations.forEach((conversation: Conversation) => {
-                    setConversations((prev) => [...prev, {uuid: conversation.uuid, name: conversation.name, start_time: conversation.start_time}]);
+                    setConversations((prev) => [...prev, { uuid: conversation.uuid, name: conversation.name, start_time: conversation.start_time }]);
                 });
             });
     }
@@ -56,16 +62,26 @@ export default function Sidebar() {
                 <div id="top-sidebar" className="flex justify-between items-center p-3">
                     <Header fnCloseSidebar={closeSidebar} />
                 </div>
+
+                <Button className="my-4 p-3 mx-4" onClick={() => { 
+                    chatKey.fn((prev) => (prev + 1))
+                    router.push("/");
+                }}>
+                    <Plus className="w-4 h-4 mr-2" /> New chat
+                </Button>
+
                 <h2 className="p-3 font-bold ">History</h2>
                 <div id="history-sidebar" className="flex-col flex-1 transition-opacity duration-500 pr-2 overflow-y-auto">
                     <History histories={conversations} updateHistory={getConversations} />
                 </div>
+
                 <div id="notify-user w-full">
                     <p className="p-3 pb-0 pt-4 text-xs leading-2 text-muted-foreground">
                         Please be aware that this feature is currently experimental. We are actively working on improvements and welcome your feedback. Your
                         experience and suggestions are valuable to us in enhancing this service. Thank you for your understanding and support!
                     </p>
                 </div>
+
                 <div id="bottom-sidebar">
                     <Profile profileName="Ilza Rachman" />
                 </div>
