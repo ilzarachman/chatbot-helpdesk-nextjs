@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useEffect, useState, ChangeEvent, useRef, LegacyRef } from "react";
-import { ChatContext, sidebarTransition } from "@/lib/context-provider";
+import { AuthenticationContext, ChatContext, sidebarTransition } from "@/lib/context-provider";
 import { Button } from "@/components/ui/button";
 import { ArrowRightFromLine, CornerDownLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -28,8 +28,9 @@ const headerAppearVariants: Variants = {
 const headerChars = splitStringIntoChars(headerText);
 const descriptionHeaderChars = splitStringIntoChars(descriptionHeaderText);
 
-export default function Chat({ conversationUUID = "" }: { conversationUUID?: string }) {
+export default function Chat({ conversationUUID = ""}: { conversationUUID?: string }) {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext, newConvHistory, chatKey } = useContext(ChatContext);
+    const { authenticated } = useContext(AuthenticationContext);
     const [history, updateHistory] = useState<Array<Array<string>>>([]);
     const [uuid, updateUUID] = useState(conversationUUID);
     const uuidRef = useRef(uuid);
@@ -50,6 +51,10 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
     }
 
     async function getMessages(conversationUUID: string) {
+        if (!authenticated.value) {
+            return;
+        }
+
         const res = await fetchAPI(`/conversation/messages/${conversationUUID}`, {
             method: "GET",
             credentials: "include",
@@ -63,6 +68,10 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
     }
 
     async function createNewConversation(message: string, userPrompt: string) {
+        if (!authenticated.value) {
+            return;
+        }
+
         const res = await fetchAPI("/conversation/new", {
             method: "POST",
             headers: {
@@ -73,11 +82,15 @@ export default function Chat({ conversationUUID = "" }: { conversationUUID?: str
         });
         const data = await res.json();
         updateUUID((prev) => data.data.uuid);
-        newConvHistory.fn({title: data.data.name, uuid: data.data.uuid});
+        newConvHistory.fn({ title: data.data.name, uuid: data.data.uuid });
         await addMessagesToConversation(data.data.uuid, userPrompt, message);
     }
 
     async function addMessagesToConversation(conversationUUID: string, userMessage: string, assistantMessage: string) {
+        if (!authenticated.value) {
+            return;
+        }
+
         const res = await fetchAPI('/chat/store', {
             method: 'POST',
             headers: {
