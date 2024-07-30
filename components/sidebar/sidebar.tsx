@@ -21,6 +21,7 @@ type Conversation = {
 export default function Sidebar() {
     const { sidebarOpen, sidebarTransition: sidebarTransitionContext, chatKey } = useContext(ChatContext);
     const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [userProfile, setUserProfile] = useState<any>({});
 
     const router = useRouter();
 
@@ -40,8 +41,20 @@ export default function Sidebar() {
             });
     }
 
+    function getProfile() {
+        return fetchAPI("/auth/user", {
+            method: "GET",
+            credentials: "include",
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setUserProfile(data);
+            });
+    }
+
     React.useEffect(() => {
         getConversations();
+        getProfile();
     }, []);
 
     function closeSidebar() {
@@ -63,7 +76,7 @@ export default function Sidebar() {
                     <Header fnCloseSidebar={closeSidebar} />
                 </div>
 
-                <Button className="my-4 p-3 mx-4" onClick={() => { 
+                <Button className="my-4 p-3 mx-4" onClick={() => {
                     chatKey.fn((prev) => (prev + 1))
                     router.push("/");
                 }}>
@@ -83,7 +96,7 @@ export default function Sidebar() {
                 </div>
 
                 <div id="bottom-sidebar">
-                    <Profile profileName="Ilza Rachman" />
+                    <Profile profileName={userProfile.name} />
                 </div>
             </nav>
         </section>

@@ -16,7 +16,7 @@ import { fetchAPI } from "@/lib/utils";
 
 const studentNumberPlaceholder = "Enter your student number";
 
-const loginSchema = z.object({
+const studentLoginSchema = z.object({
     studentNumber: z.string().min(1, "Student number is required"),
     password: z.string().min(1, "Password is required"),
 });
@@ -25,15 +25,15 @@ export default function LoginForm() {
     const [loadingLogin, setLoadingLogin] = React.useState(false);
     const router = useRouter();
 
-    const form = useForm<z.infer<typeof loginSchema>>({
-        resolver: zodResolver(loginSchema),
+    const form = useForm<z.infer<typeof studentLoginSchema>>({
+        resolver: zodResolver(studentLoginSchema),
         defaultValues: {
             studentNumber: "",
             password: "",
         },
     });
 
-    function onSubmit(values: z.infer<typeof loginSchema>) {
+    function onSubmit(values: z.infer<typeof studentLoginSchema>) {
         console.log(values);
         const login = async () => {
             setLoadingLogin(true);
@@ -76,11 +76,7 @@ export default function LoginForm() {
 
     return (
         <Card className="w-[350px] shadow-lg shadow-slate-900">
-            <CardHeader>
-                <CardTitle className="font-bold text-3xl">Login</CardTitle>
-                <CardDescription>You are entering chatbot application, please enter your credentials.</CardDescription>
-            </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
@@ -119,4 +115,111 @@ export default function LoginForm() {
             </CardContent>
         </Card>
     );
+}
+
+const staffNumberPlaceholder = "Enter your staff number";
+
+const staffLoginSchema = z.object({
+    staffNumber: z.string().min(1, "Staff number is required"),
+    password: z.string().min(1, "Password is required"),
+})
+
+export function StaffLoginForm() {
+    const [loadingLogin, setLoadingLogin] = React.useState(false);
+    const router = useRouter();
+
+    const form = useForm<z.infer<typeof staffLoginSchema>>({
+        resolver: zodResolver(staffLoginSchema),
+        defaultValues: {
+            staffNumber: "",
+            password: "",
+        },
+    });
+
+    function onSubmit(values: z.infer<typeof staffLoginSchema>) {
+        console.log(values);
+        const login = async () => {
+            setLoadingLogin(true);
+            try {
+                const res = await fetchAPI("/auth/staff/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        staff_number: values.staffNumber,
+                        password: values.password,
+                    }),
+                    credentials: "include",
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data) {
+                        console.log("success");
+                        router.push("/staff");
+                    }
+                } else {
+                    alert("Failed to login! Please try again.");
+                    setLoadingLogin(false);
+                }
+            } catch (error) {
+                console.error("Failed to login", error);
+                alert("Failed to login! Please try again.");
+                setLoadingLogin(false);
+            }
+        };
+
+        if (values.staffNumber && values.password) {
+            login();
+        } else {
+            console.log("failed");
+            alert("Please enter both student number and password");
+        }
+    }
+
+    return (
+        <Card className="w-[350px] shadow-lg shadow-red-800">
+            <CardHeader>
+                <CardTitle className="font-bold text-3xl">Login</CardTitle>
+                <CardDescription>Entering administration room for staff!</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="staffNumber"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Staff Number</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder={staffNumberPlaceholder} type="text" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Password" type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button variant="default" type="submit" className="px-6" disabled={loadingLogin}>
+                            Login
+                            {loadingLogin ? <LoaderCircle className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
+    );
+
 }
