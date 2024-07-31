@@ -5,6 +5,7 @@ import { fetchAPI } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthenticationContext } from "@/lib/context-provider";
+import { checkAuth } from "@/lib/middleware";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,33 +13,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await fetchAPI("/auth", {
-                    credentials: "include",
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data) {
-                        setLoading(false);
-                        setIsAuthenticated(true);
-                    } else {
-                        // router.push("/login");
-                    }
-                } else {
-                    // router.push("/login");
-                    setLoading(false);
-                    setIsAuthenticated(false);
-                }
-            } catch (error) {
-                // console.error("Failed to check authentication", error);
-                setLoading(false);
-                setIsAuthenticated(false);
-                // router.push("/login");
-            }
-        };
-
-        checkAuth();
+        checkAuth(2, () => {
+            setLoading(false);
+            setIsAuthenticated(true);
+        }, () => {
+            setLoading(false);
+            setIsAuthenticated(false);
+        });
     });
 
     return (
