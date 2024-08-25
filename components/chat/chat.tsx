@@ -59,12 +59,14 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
             method: "GET",
             credentials: "include",
         });
+
         const data = await res.json();
         const messages = data.data.messages;
         updateHistory([]);
         messages.forEach((message: { user: string; assistant: string; }) => {
             updateHistory((prev) => [...prev, [message.user, message.assistant]]);
         });
+
     }
 
     async function createNewConversation(message: string, userPrompt: string) {
@@ -272,14 +274,14 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
                         {history.map((item, index) => (
                             <div key={index} data-generation={false}>
                                 <UserChat text={item[0]} />
-                                <BotChat text={item[1]} generation={false} />
+                                <BotChat text={item[1]} generation={false} prompt={item[0]} />
                             </div>
                         ))}
 
                         {isUpdatingResponse ? (
                             <div data-generation>
                                 <UserChat text={prompt} />
-                                <BotChat text={streamResponse} generation={true} />
+                                <BotChat text={streamResponse} generation={true} prompt={prompt} />
                             </div>
                         ) : (
                             ""

@@ -20,7 +20,7 @@ export function checkAuth(accessLevel: number, onSuccess: (accessLevel: number) 
         .then((res) => {
             if (res.ok) {
                 res.json().then((data) => {
-                    if (data <= accessLevel) {
+                    if (data.access_level <= accessLevel) {
                         onSuccess(data);
                     } else {
                         onFailure(data);

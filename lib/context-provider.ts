@@ -23,7 +23,9 @@ type AuthenticationContextValue = {
     authenticated: {
         value: boolean;
         fn: (value: boolean) => void;
-    }
+    },
+    authenticatedName: string;
+    authenticatedEmail: string;
 }
 
 export const ChatContext = createContext({} as ChatContextValue);
