@@ -108,6 +108,10 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
     }, [uuid]);
 
     useEffect(() => {
+        uuidRef.current = conversationUUID;
+    }, []);
+
+    useEffect(() => {
         if (conversationUUID) {
             getMessages(conversationUUID);
         }
@@ -143,14 +147,14 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
                 }
 
                 setIsUpdatingResponse(true);
-                getChatbotResponse({ message: _prompt, conversation_uuid: uuidRef.current }, handleStreamedResponse, (response: string) => {
+                getChatbotResponse({ message: _prompt, conversation_uuid: uuidRef.current || conversationUUID }, handleStreamedResponse, (response: string) => {
                     if (!conversationUUID && uuidRef.current === "") {
                         console.log("Starting new conversation!");
                         createNewConversation(response, _prompt);
                     }
 
-                    if (uuidRef.current !== "") {
-                        addMessagesToConversation(uuidRef.current, _prompt, response);
+                    if (uuidRef.current !== "" || conversationUUID) {
+                        addMessagesToConversation(uuidRef.current || conversationUUID, _prompt, response);
                     }
 
                     updateHistory((prev) => [...prev, [_prompt, response]]);
@@ -221,7 +225,7 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
     }, [chatKey.value]);
 
     return (
-        <section className="w-full h-svh bg-gray-950 z-10 pb-1 flex flex-col">
+        <section className="w-full h-svh bg-background z-10 pb-1 flex flex-col">
             <div className="flex items-center justify-center p-4 py-6 relative">
                 <div className="flex items-center gap-2">
                     <Button
@@ -248,7 +252,7 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
                                     className="font-bold text-8xl leading-[1] pb-2 text-foreground"
                                 >
                                     {headerChars.map((char, index) => (
-                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
+                                        <motion.span key={index} className="tracking-tight" transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
                                             {char}
                                         </motion.span>
                                     ))}
@@ -261,7 +265,7 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
                                     className="text-muted-foreground w-[70%] mt-4"
                                 >
                                     {descriptionHeaderChars.map((char, index) => (
-                                        <motion.span key={index} transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
+                                        <motion.span key={index} className="tracking-tight" transition={{ duration: 0.5, ease: "easeIn" }} variants={headerAppearVariants}>
                                             {char}
                                         </motion.span>
                                     ))}
@@ -290,9 +294,9 @@ export default function Chat({ conversationUUID = ""}: { conversationUUID?: stri
                 </div>
             </div>
             <div role="_chat_input" className="flex flex-col items-center gap-2 max-w-[830px] mx-auto w-[830px] relative">
-                <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-gray-950 absolute -translate-y-full"></div>
+                <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-background absolute -translate-y-full"></div>
                 <div
-                    className="w-full min-h-[56px] max-h-[200px] bg-gray-900 rounded-3xl flex items-center group hover:cursor-text"
+                    className="w-full min-h-[56px] max-h-[200px] bg-background border rounded-3xl flex items-center group hover:cursor-text"
                     onClick={() => {
                         promptArea.current?.focus();
                     }}

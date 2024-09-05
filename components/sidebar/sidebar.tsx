@@ -65,7 +65,7 @@ export default function Sidebar() {
 
     return (
         <section
-            className="h-svh flex-shrink-0 transition-[width] duration-300 bg-gray-950"
+            className="h-svh flex-shrink-0 transition-[width] duration-300 bg-background"
             style={{
                 width: sidebarOpen.value ? "300px" : "0px",
                 visibility: sidebarTransitionContext.value ? "visible" : sidebarOpen.value ? "visible" : "hidden",
