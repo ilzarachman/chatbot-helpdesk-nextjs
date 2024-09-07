@@ -28,9 +28,9 @@ import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
 import { Link, animateScroll as scroll } from "react-scroll";
 
-const headerText = "Hai, Selamat datang! Apa yang bisa aku bantu?";
+const headerText = "Halo, ada yang bisa aku bantu?";
 const descriptionHeaderText =
-  "Aku adalah asisten chatbot kampus. Kamu bisa tanya apa saja yang berhubungan dengan kampus, mulai dari informasi akademik, kegiatan mahasiswa, fasilitas, hingga jadwal acara. Aku juga siap menerima masukan atau saran yang kamu punya.";
+  "Selamat datang! Saya adalah chatbot helpdesk Unesa. Silakan tanyakan kebutuhan Anda. Jika jawaban saya kurang tepat, Anda dapat mengirimkan feedback melalui tombol feedback, jawaban akan diterima melalui email jika sudah terjawab";
 
 const headerAppearVariants: Variants = {
   hidden: {
@@ -282,13 +282,13 @@ export default function Chat({
       <div className="flex items-center justify-center p-4 py-6 relative">
         <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
+            variant="default"
             size="icon"
             onClick={openSidebar}
-            className="absolute left-4"
+            className="absolute left-4 bg-[#3498DB] hover:bg-[#175782]"
             style={{ display: sidebarOpen.value ? "none" : "inline-flex" }}
           >
-            <ArrowRightFromLine className="w-4" />
+            <ArrowRightFromLine className="w-4" strokeWidth={2.5} />
           </Button>
           <h1 className="font-bold invisible">Title of this chat</h1>
         </div>
@@ -312,7 +312,7 @@ export default function Chat({
                   initial="hidden"
                   whileInView="visible"
                   transition={{ staggerChildren: 0.015 }}
-                  className="font-bold text-8xl leading-[1] pb-2 text-foreground"
+                  className="font-semibold text-8xl leading-[1] pb-2"
                 >
                   {headerChars.map((char, index) => (
                     <motion.span
