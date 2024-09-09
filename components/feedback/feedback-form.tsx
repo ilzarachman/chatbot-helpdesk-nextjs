@@ -170,7 +170,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ bot_answer, prompt, onClose
                             value={formData.name}
                             onChange={handleChange}
                             required
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full focus-visible:ring-[#3498DB]"
                         />
                         {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                     </div>
@@ -185,7 +185,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ bot_answer, prompt, onClose
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full focus-visible:ring-[#3498DB]"
                         />
                         {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
@@ -202,11 +202,11 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ bot_answer, prompt, onClose
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="mt-1 block w-full"
+                    className="mt-1 block w-full focus-visible:ring-[#3498DB]"
                 />
                 {errors.feedback && <p className="text-red-500 text-sm mt-1">{errors.feedback}</p>}
             </div>
-            <Button type="submit" className="mt-4" disabled={isSubmitting}>
+            <Button type="submit" className="mt-4 bg-[#3498DB] hover:bg-[#175782]" disabled={isSubmitting}>
                 {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
         </form>
