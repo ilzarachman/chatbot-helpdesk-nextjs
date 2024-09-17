@@ -27,12 +27,12 @@ export default function Profile({ profileName }: { profileName: string }) {
         <div className="w-full mb-2">
             <div className="p-3">
                 <div className="flex gap-2 justify-between items-center">
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-3 items-center w-[calc(100%-2.5rem)]">
                         <Avatar className="size-8">
                             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
-                        <p className="font-normal ">{profileName}</p>
+                        <p className="font-normal overflow-ellipsis overflow-hidden whitespace-nowrap grow">{profileName}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="translate-x-3" onClick={handleLogout}>
                         <LogOut className="w-4" />

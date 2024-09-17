@@ -28,6 +28,9 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { fetchAPI } from "@/lib/utils";
+import GoogleIcon from "@/assets/google-icon.svg";
+import Image from "next/image";
+import { useToast } from "./ui/use-toast";
 
 const studentNumberPlaceholder = "Enter your student number";
 
@@ -39,6 +42,7 @@ const studentLoginSchema = z.object({
 export default function LoginForm() {
   const [loadingLogin, setLoadingLogin] = React.useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof studentLoginSchema>>({
     resolver: zodResolver(studentLoginSchema),
@@ -89,9 +93,49 @@ export default function LoginForm() {
     }
   }
 
+  function googleSignIn() {
+    setLoadingLogin(true);
+
+    fetchAPI("/auth/google-oauth/login", {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        const redirectUrl = data.redirect_url;
+
+        // Open the redirect URL in a new small window
+        const popup = window.open(
+          redirectUrl,
+          "_blank",
+          "popup,scrollbars=yes,height=600,width=600"
+        );
+
+        window.addEventListener("message", (event) => {
+          if (event.source === popup) {
+            setLoadingLogin(false);
+
+            const data = event.data;
+
+            if (data.status !== "none") {
+              router.push("/");
+            } else {
+                toast({
+                    title: `Error: ${data.error}`,
+                    description: data.desc,
+                    variant: "destructive",
+                })
+            }
+          }
+        });
+      });
+  }
+
   return (
     <Card className="w-[350px] shadow-lg shadow-slate-200">
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 gap-5 flex flex-col">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -119,7 +163,12 @@ export default function LoginForm() {
                 <FormItem className="relative">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Password" type="password" className="focus-visible:ring-[#3498DB]" {...field} />
+                    <Input
+                      placeholder="Password"
+                      type="password"
+                      className="focus-visible:ring-[#3498DB]"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,7 +180,7 @@ export default function LoginForm() {
               className="px-6 bg-[#3498DB] hover:bg-[#175782]"
               disabled={loadingLogin}
             >
-              Login
+              Sign in using student number
               {loadingLogin ? (
                 <LoaderCircle className="ml-2 h-4 w-4 animate-spin" />
               ) : (
@@ -140,6 +189,33 @@ export default function LoginForm() {
             </Button>
           </form>
         </Form>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        {/* <form action={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google-oauth/login`} target="_blank" method="POST"> */}
+        <Button
+          variant="outline"
+          // type="submit"
+          type="button"
+          disabled={loadingLogin}
+          className="w-full gap-3"
+          onClick={() => googleSignIn()}
+        >
+          {loadingLogin ? (
+            <LoaderCircle className="ml-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Image src={GoogleIcon} alt="Google Icon" className="h-4 w-4" />
+          )}
+          Unesa email
+        </Button>
+        {/* </form> */}
         <p className="g-paragraph [&:not(:first-child)]:mt-6 text-xs">
           *If you don't have an account, please contact your supervisor.
         </p>
