@@ -376,7 +376,7 @@ export default function Chat({
       >
         <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-background absolute -translate-y-full"></div>
         <div
-          className="w-full min-h-[56px] max-h-[200px] bg-background border rounded-3xl flex items-center group hover:cursor-text"
+          className="w-full min-h-[56px] max-h-[200px] bg-gray-50 border rounded-3xl flex items-center group hover:cursor-text"
           onClick={() => {
             promptArea.current?.focus();
           }}

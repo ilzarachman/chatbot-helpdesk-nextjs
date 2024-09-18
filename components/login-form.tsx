@@ -213,7 +213,7 @@ export default function LoginForm() {
           ) : (
             <Image src={GoogleIcon} alt="Google Icon" className="h-4 w-4" />
           )}
-          Unesa email
+          Google
         </Button>
         {/* </form> */}
         <p className="g-paragraph [&:not(:first-child)]:mt-6 text-xs">

@@ -32,11 +32,11 @@ export default function AuthenticationPage() {
                 />
             </div>
             <div className="container relative hidden h-svh flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-                <div className="relative hidden h-full flex-col bg-muted p-10 text-slate-900 dark:border-r lg:flex">
+                <div className="relative hidden h-full flex-col bg-muted p-8 text-slate-900 dark:border-r lg:flex">
                     <div className="absolute inset-0 bg-[url(https://upload.wikimedia.org/wikipedia/commons/1/14/Gedung_Rektorat_Unesa.jpg)] bg-top" />
-                    <Link href="/"className="relative z-20 flex items-center text-lg font-medium gap-3">
+                    <Link href="/"className="relative z-20 flex items-center text-md font-medium gap-5">
                         <Image src={LogoUnesa} alt="Logo Unesa" width={40} />
-                        Helpdesk Unesa
+                        Universitas Negeri Surabaya
                     </Link>
                     <div className="relative z-20 mt-auto">
                         <blockquote className="space-y-2">
