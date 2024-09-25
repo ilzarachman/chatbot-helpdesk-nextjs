@@ -4,7 +4,7 @@ import React from "react";
 import axios from "axios";
 
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
  * @return {number} The converted value in pixels.
  */
 export function convertRemToPixels(rem: number) {
-    return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
 /**
@@ -25,10 +25,10 @@ export function convertRemToPixels(rem: number) {
  * @return {Promise<Response>} A promise that resolves to the response from the API.
  */
 export async function fetchAPI(input: string | URL, init?: RequestInit) {
-    const api_url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    const url = new URL(`/api/v1${input}`, api_url);
-    const response = fetch(url, init);
-    return response;
+  const api_url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const url = new URL(`/api/v1${input}`, api_url);
+  const response = fetch(url, init);
+  return response;
 }
 
 /**
@@ -39,44 +39,48 @@ export async function fetchAPI(input: string | URL, init?: RequestInit) {
  * @param {(value: string) => void} [afterEffect] - An optional callback function that is called after the response is complete.
  * @return {Promise<void>} A Promise that resolves when the response is complete.
  */
-export async function getChatbotResponse(data: { message: string; conversation_uuid: string }, updateValue: (value: string) => void, afterEffect?: (value: string) => void) {
-    try {
-        const response = await fetchAPI(`/chat/prompt`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-            credentials: "include",
-        });
+export async function getChatbotResponse(
+  data: { message: string; conversation_uuid: string; history: string },
+  updateValue: (value: string) => void,
+  afterEffect?: (value: string) => void
+) {
+  try {
+    const response = await fetchAPI(`/chat/prompt`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
 
-        const reader = (response.body as ReadableStream<Uint8Array>)?.getReader();
-        const decoder = new TextDecoder();
-        let finalText = "";
+    const reader = (response.body as ReadableStream<Uint8Array>)?.getReader();
+    const decoder = new TextDecoder();
+    let finalText = "";
 
-        const stream = new ReadableStream({
-            start(controller) {
-                function push() {
-                    reader.read().then(({ done, value }) => {
-                        if (done) {
-                            controller.close();
-                            afterEffect?.(finalText);
-                            return;
-                        }
+    const stream = new ReadableStream({
+      start(controller) {
+        function push() {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              controller.close();
+              afterEffect?.(finalText);
+              return;
+            }
 
-                        const chunk = decoder.decode(value, { stream: true });
-                        updateValue(chunk);
-                        finalText += chunk;
-                        push();
-                    });
-                }
+            const chunk = decoder.decode(value, { stream: true });
+            updateValue(chunk);
+            finalText += chunk;
+            push();
+          });
+        }
 
-                push();
-            },
-        });
-    } catch (error) {
-        console.error(error);
-    }
+        push();
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
@@ -86,15 +90,15 @@ export async function getChatbotResponse(data: { message: string; conversation_u
  * @return {string[]} An array of characters extracted from the input string.
  */
 export function splitStringIntoChars(string: string): string[] {
-    const characters = [];
-    const regex = /[\s\S]/g;
+  const characters = [];
+  const regex = /[\s\S]/g;
 
-    let match;
-    while ((match = regex.exec(string)) !== null) {
-        characters.push(match[0]);
-    }
+  let match;
+  while ((match = regex.exec(string)) !== null) {
+    characters.push(match[0]);
+  }
 
-    return characters;
+  return characters;
 }
 
 /**
@@ -104,7 +108,7 @@ export function splitStringIntoChars(string: string): string[] {
  * @return {void} No return value.
  */
 export function saveSidebarState(sidebarOpen: boolean) {
-    localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
+  localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
 }
 
 /**
@@ -113,6 +117,8 @@ export function saveSidebarState(sidebarOpen: boolean) {
  * @return {boolean} The boolean value representing the state of the sidebar.
  */
 export function getSidebarState(): boolean {
-    const sidebarOpen = JSON.parse(localStorage.getItem("sidebarOpen") ?? "false");
-    return sidebarOpen;
+  const sidebarOpen = JSON.parse(
+    localStorage.getItem("sidebarOpen") ?? "false"
+  );
+  return sidebarOpen;
 }

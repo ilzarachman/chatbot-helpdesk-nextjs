@@ -72,6 +72,10 @@ export default function Chat({
   useEffect(() => {
     uuidRef.current = conversationUUID;
     focusToPrompt();
+
+    if (localStorage.getItem("history")) {
+      localStorage.removeItem("history");
+    }
   }, []);
 
   function focusToPrompt() {
@@ -194,6 +198,7 @@ export default function Chat({
           {
             message: _prompt,
             conversation_uuid: uuidRef.current || conversationUUID,
+            history: localStorage.getItem("history") || "[]",
           },
           handleStreamedResponse,
           (response: string) => {
@@ -210,7 +215,17 @@ export default function Chat({
               );
             }
 
-            updateHistory((prev) => [...prev, [_prompt, response]]);
+            updateHistory((prev) => {
+              const _history = [...prev, [_prompt, response]];
+              const _historyLocalStorage = _history.map((h) => {
+                return { U: h[0], A: h[1] };
+              });
+              localStorage.setItem(
+                "history",
+                JSON.stringify(_historyLocalStorage.slice(-2))
+              );
+              return _history;
+            });
             updatePrompt("");
             updateStreamResponse("");
             setIsUpdatingResponse(false);
