@@ -10,6 +10,7 @@ import { ArrowRightFromLine } from "lucide-react";
 import { useRouter } from "next/navigation";
 import LogoUnesa from "@/assets/logo-unesa.svg";
 import Image from "next/image";
+import WhatsappLogo from "@/assets/whatsapp-icon.svg";
 
 export default function ChatPage({
   children,
@@ -75,10 +76,12 @@ function NotLoggedIn({ children }: { children: React.ReactNode }) {
       <Button
         variant="link"
         className="absolute top-8 left-8 z-40 flex gap-5 items-center p-0"
-        >
-      <Image src={LogoUnesa} alt="Logo Unesa" className="w-10" />
-      <h1 className="font-medium text-md text-slate-600">Universitas Negeri Surabaya</h1>
-        </Button>
+      >
+        <Image src={LogoUnesa} alt="Logo Unesa" className="w-10" />
+        <h1 className="font-medium text-md text-slate-600">
+          Universitas Negeri Surabaya
+        </h1>
+      </Button>
       {children}
     </main>
   );

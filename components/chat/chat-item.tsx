@@ -21,7 +21,10 @@ export function UserChat({ text }: { text: string }) {
     <>
       <div className="p-7 max-w-3xl flex gap-5 w-full min-w-full bg-muted rounded-3xl pr-14 ">
         <Avatar>
-          <AvatarImage src="https://t4.ftcdn.net/jpg/01/23/09/33/360_F_123093367_c7WoJ0uHCkepbgLasnGFBKK8sSNiJw6l.jpg" alt="@shadcn" />
+          <AvatarImage
+            src="https://t4.ftcdn.net/jpg/01/23/09/33/360_F_123093367_c7WoJ0uHCkepbgLasnGFBKK8sSNiJw6l.jpg"
+            alt="@shadcn"
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <p className="text-foreground pt-2 w-full">{text}</p>

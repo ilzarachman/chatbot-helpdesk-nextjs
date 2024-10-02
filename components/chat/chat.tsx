@@ -27,6 +27,8 @@ import { UserChat, BotChat } from "@/components/chat/chat-item";
 import { getChatbotResponse } from "@/lib/utils";
 import { motion, Variants } from "framer-motion";
 import { Link, animateScroll as scroll } from "react-scroll";
+import Image from "next/image";
+import WhatsappLogo from "@/assets/whatsapp-icon.svg";
 
 const headerText = "Halo, ada yang bisa aku bantu?";
 const descriptionHeaderText =
@@ -294,6 +296,13 @@ export default function Chat({
 
   return (
     <section className="w-full h-svh bg-background z-10 pb-1 flex flex-col">
+      <Button
+        variant="link"
+        className="absolute bottom-24 right-8 p-5 z-40"
+        onClick={() => window.open("https://wa.me/6281333082211", "_blank")}
+      >
+        <Image src={WhatsappLogo} alt="Informasi Kontak" className="w-16" />
+      </Button>
       <div className="flex items-center justify-center p-4 py-6 relative">
         <div className="flex items-center gap-2">
           <Button
@@ -387,11 +396,11 @@ export default function Chat({
       </div>
       <div
         role="_chat_input"
-        className="flex flex-col items-center gap-2 max-w-[830px] mx-auto w-[830px] relative"
+        className="flex flex-col items-center gap-2 max-w-[830px] mx-auto w-[830px] relative mb-5"
       >
         <div className="w-[calc(100%+100px)] h-8 bg-gradient-to-t from-background absolute -translate-y-full"></div>
         <div
-          className="w-full min-h-[56px] max-h-[200px] bg-gray-50 border rounded-3xl flex items-center group hover:cursor-text"
+          className="w-full min-h-[56px] max-h-[200px] bg-gray-100 border rounded-3xl flex items-center group hover:cursor-text shadow-md"
           onClick={() => {
             promptArea.current?.focus();
           }}
